@@ -2,308 +2,318 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DosiCare Pro - Prescripción Multi-Medicamento (Autónomo)</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://googleapis.com" rel="stylesheet">
     <style>
         :root {
-            --primary: #1e3a8a; --primary-light: #2563eb; --accent: #0d9488; --bg: #f8fafc;
-            --surface: #ffffff; --text-dark: #0f172a; --text-muted: #64748b; --border: #cbd5e1;
-            --warning-bg: #fffbeb; --warning-border: #f59e0b; --danger-bg: #fef2f2; --danger-border: #ef4444;
+            --primary: #4f46e5;
+            --primary-light: #e0e7ff;
+            --surface: #ffffff;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --border: #cbd5e1;
+            --warning-bg: #fffbeb;
+            --warning-border: #f59e0b;
+            --danger-bg: #fef2f2;
+            --danger-border: #ef4444;
+            --success: #10b981;
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-        body { background: var(--bg); color: var(--text-dark); padding: 30px 15px; }
-        .wrapper { max-width: 960px; margin: auto; }
-        .card { background: var(--surface); border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 10px 25px -5px rgba(0,0,0,0.06); overflow: hidden; }
-        .header { background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); color: white; padding: 28px; text-align: center; }
-        .header h1 { font-size: 26px; font-weight: 700; }
-        .header p { color: #cbd5e1; font-size: 14px; margin-top: 5px; }
-        .badge-status { display: inline-block; background: #16a34a; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; text-transform: uppercase; margin-top: 10px; color: white; }
-        .form-body { padding: 30px; }
-        .section-title { font-size: 14px; font-weight: 700; text-transform: uppercase; color: var(--primary); margin-bottom: 15px; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; }
-        .grid-3 { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 14px; margin-bottom: 20px; }
-        .field label { display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; }
-        .field input, .field select { width: 100%; padding: 11px 13px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 14px; color: var(--text-dark); outline: none; background: #fff; }
-        .field input:focus, .field select:focus { border-color: var(--primary-light); }
-        .med-row { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px; margin-bottom: 14px; position: relative; }
-        .med-row-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .med-badge { font-size: 12px; font-weight: 700; color: #1e3a8a; background: #e0f2fe; padding: 3px 10px; border-radius: 6px; }
-        .btn-del { background: #fee2e2; color: #dc2626; border: none; padding: 5px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; }
-        .btn-add { background: #f1f5f9; color: var(--primary); border: 2px dashed #94a3b8; width: 100%; padding: 12px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; margin-bottom: 22px; }
-        .btn-calc { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; }
-        #panel-resultados { display: none; margin-top: 30px; border-top: 2px dashed var(--border); padding-top: 25px; }
-        .metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 20px; }
-        .metric-box { background: #f1f5f9; padding: 16px; border-radius: 12px; border: 1px solid #e2e8f0; text-align: center; }
-        .metric-title { font-size: 11px; text-transform: uppercase; font-weight: 700; color: var(--text-muted); }
-        .metric-val { font-size: 16px; font-weight: 700; color: var(--primary); margin-top: 6px; }
-        .banner-alert { padding: 14px 18px; border-radius: 10px; margin-bottom: 12px; font-size: 13.5px; line-height: 1.5; }
-        .banner-alert.warning { background: var(--warning-bg); border-left: 4px solid var(--warning-border); color: #92400e; }
-        .banner-alert.danger { background: var(--danger-bg); border-left: 4px solid var(--danger-border); color: #991b1b; }
-        .banner-alert.success { background: #f0fdf4; border-left: 4px solid #16a34a; color: #166534; }
-        .table-wrap { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-top: 20px; }
-        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13.5px; }
-        th { background: #f8fafc; padding: 12px 16px; font-weight: 600; color: var(--text-muted); border-bottom: 1px solid var(--border); }
-        td { padding: 12px 16px; border-bottom: 1px solid var(--border); }
-        .badge-dia { background: #e0f2fe; color: #0369a1; padding: 3px 8px; border-radius: 6px; font-size: 12px; font-weight: 600; }
-        .hora-text { font-family: monospace; font-size: 15px; font-weight: 700; color: #1e40af; }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            color: var(--text-dark);
+            padding: 30px 15px;
+            min-height: 100vh;
+        }
+
+        .wrapper {
+            max-width: 960px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: var(--surface);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
+            overflow: hidden;
+            margin-bottom: 25px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4f46e5, #3b82f6);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .header p {
+            color: var(--primary-light);
+            font-size: 14px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            text-transform: uppercase;
+            margin-top: 10px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .form-body {
+            padding: 25px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--primary);
+            margin-bottom: 15px;
+            padding-bottom: 6px;
+            border-bottom: 2px solid var(--primary-light);
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .grid-med {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+            align-items: end;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            color: var(--text-dark);
+            background: #fff;
+            transition: all 0.2s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        .med-row {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 15px;
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .btn-add {
+            background: transparent;
+            color: var(--primary);
+            border: 2px dashed var(--primary);
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .btn-add:hover {
+            background: var(--primary-light);
+        }
+
+        .btn-submit {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.2s;
+        }
+
+        .btn-submit:hover {
+            background: #4338ca;
+        }
+
+        .btn-remove {
+            background: var(--danger-bg);
+            color: var(--danger-border);
+            border: 1px solid var(--danger-border);
+            padding: 9px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .btn-remove:hover {
+            background: #fee2e2;
+        }
+
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        th {
+            background: #f1f5f9;
+            color: var(--text-dark);
+            font-weight: 600;
+            text-align: left;
+            padding: 12px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+            color: var(--text-dark);
+        }
+
+        tr:hover {
+            background: #f8fafc;
+        }
+
+        .alert-box {
+            padding: 12px 15px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .alert-warning {
+            background: var(--warning-bg);
+            border-left: 4px solid var(--warning-border);
+            color: #92400e;
+        }
     </style>
 </head>
 <body>
-    <div class="wrapper">
+
+<div class="wrapper">
+    <!-- Encabezado Principal -->
+    <div class="card">
+        <div class="header">
+            <h1>DosiCare Pro · Prescripción Médica Multi-Fármaco</h1>
+            <p>Gestión de dosis por peso, horarios en formato militar y alertas autónomas locales</p>
+            <div class="status-badge">Modo Local Autónomo Activo</div>
+        </div>
+    </div>
+
+    <form id="prescriptionForm" onsubmit="procesarPrescripcion(event)">
+        <!-- Sección 1: Datos del Paciente -->
         <div class="card">
-            <div class="header">
-                <h1>DosiCare Pro · Prescripción Médica Multi-Fármaco</h1>
-                <p>Gestión de dosis por peso, horarios en formato militar y alertas autónomas locales</p>
-                <div class="badge-status">Modo Local Autónomo Activo</div>
-            </div>
             <div class="form-body">
                 <div class="section-title">1. Datos del Paciente</div>
                 <div class="grid-3">
-                    <div class="field">
-                        <label>Nombre del Paciente</label>
-                        <input type="text" id="p_nombre" value="Lina Lopez">
+                    <div class="form-group">
+                        <label for="pacienteNombre">Nombre del Paciente</label>
+                        <input type="text" id="pacienteNombre" value="Lina Lopez" required>
                     </div>
-                    <div class="field">
-                        <label>Edad (Años)</label>
-                        <input type="number" id="p_edad" value="11">
+                    <div class="form-group">
+                        <label for="pacienteEdad">Edad (Años)</label>
+                        <input type="number" id="pacienteEdad" value="11" min="0" required>
                     </div>
-                    <div class="field">
-                        <label>Peso Corporal (kg)</label>
-                        <input type="number" id="p_peso" step="0.1" value="45.0">
-                    </div>
-                </div>
-                <div class="section-title">2. Medicamentos a Prescribir</div>
-                <div id="contenedor-medicamentos"></div>
-                <button class="btn-add" onclick="agregarFilaMedicamento()">+ Agregar otro fármaco</button>
-                <button class="btn-calc" onclick="procesarTratamientoLocal()">⚡ Procesar Prescripción</button>
-
-                <div id="panel-resultados">
-                    <div class="metrics-grid">
-                        <div class="metric-box"><div class="metric-title">Grupo</div><div id="res_cat" class="metric-val">-</div></div>
-                        <div class="metric-box"><div class="metric-title">Fármacos</div><div id="res_num_meds" class="metric-val">-</div></div>
-                        <div class="metric-box"><div class="metric-title">Total Tomas</div><div id="res_total_tomas" class="metric-val">-</div></div>
-                    </div>
-                    <div id="alerta_forma" class="banner-alert success"></div>
-                    <div id="area_alertas_topes"></div>
-                    <div id="alerta_cruces" class="banner-alert"></div>
-                    <div class="table-wrap">
-                        <table>
-                            <thead>
-                                <tr><th>Día</th><th>Hora Militar</th><th>Medicamento</th><th>Cantidad por Toma</th></tr>
-                            </thead>
-                            <tbody id="res_tabla"></tbody>
-                        </table>
+                    <div class="form-group">
+                        <label for="pacientePeso">Peso Corporal (kg)</label>
+                        <input type="number" id="pacientePeso" value="45.0" step="0.1" min="0" required>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    <script>
-        const CATALOGO_JS = [
-            {id: 1, nombre: "Paracetamol", mg_kg: 15.0, intervalo: 6, tope_mg: 1000.0, mg_5ml: 120.0},
-            {id: 2, nombre: "Ibuprofeno", mg_kg: 10.0, intervalo: 8, tope_mg: 800.0, mg_5ml: 100.0},
-            {id: 3, nombre: "Amoxicilina", mg_kg: 25.0, intervalo: 8, tope_mg: 1000.0, mg_5ml: 250.0},
-            {id: 4, nombre: "Azitromicina", mg_kg: 10.0, intervalo: 24, tope_mg: 500.0, mg_5ml: 200.0},
-            {id: 5, nombre: "Cefalexina", mg_kg: 12.5, intervalo: 12, tope_mg: 500.0, mg_5ml: 250.0},
-            {id: 6, nombre: "Dipirona", mg_kg: 12.0, intervalo: 6, tope_mg: 1000.0, mg_5ml: 250.0}
-        ];
 
-        let contadorFilas = 0;
-        window.onload = function() { agregarFilaMedicamento(); };
-
-        function agregarFilaMedicamento() {
-            contadorFilas++;
-            const idFila = 'fila_med_' + contadorFilas;
-            const contenedor = document.getElementById('contenedor-medicamentos');
-            const div = document.createElement('div');
-            div.className = 'med-row';
-            div.id = idFila;
-            div.innerHTML = `
-                <div class="med-row-header">
-                    <span class="med-badge">Medicamento #${contadorFilas}</span>
-                    ${contadorFilas > 1 ? `<button class="btn-del" onclick="eliminarFila('${idFila}')">✕ Eliminar</button>` : ''}
-                </div>
-                <div class="grid-3">
-                    <div class="field">
-                        <label>Fármaco</label>
-                        <select class="med-select">
-                            <option value="1">1. Paracetamol (15 mg/kg)</option>
-                            <option value="2">2. Ibuprofeno (10 mg/kg)</option>
-                            <option value="3">3. Amoxicilina (25 mg/kg)</option>
-                            <option value="4">4. Azitromicina (10 mg/kg)</option>
-                            <option value="5">5. Cefalexina (12.5 mg/kg)</option>
-                            <option value="6" selected>6. Dipirona (12 mg/kg)</option>
-                        </select>
-                    </div>
-                    <div class="field">
-                        <label>1ra Toma (HH:MM)</label>
-                        <input type="text" class="med-hora" value="12:00">
-                    </div>
-                    <div class="field">
-                        <label>Días</label>
-                        <input type="number" class="med-dias" value="5">
+        <!-- Sección 2: Medicamentos -->
+        <div class="card">
+            <div class="form-body">
+                <div class="section-title">2. Medicamentos a Prescribir</div>
+                
+                <div id="medicamentosContainer">
+                    <!-- Fila de medicamento por defecto -->
+                    <div class="med-row">
+                        <div class="grid-med">
+                            <div class="form-group">
+                                <label>Medicamento / Fármaco</label>
+                                <input type="text" placeholder="Ej. Acetaminofén (Jarabe o Tabletas)" required class="med-nombre">
+                            </div>
+                            <div class="form-group">
+                                <label>Dosis Requerida</label>
+                                <input type="text" placeholder="Ej. 500mg o 5ml" required class="med-dosis">
+                            </div>
+                            <div class="form-group">
+                                <label>Frecuencia (Horas)</label>
+                                <select class="med-frecuencia">
+                                    <option value="4">Cada 4 horas</option>
+                                    <option value="6">Cada 6 horas</option>
+                                    <option value="8" selected>Cada 8 horas</option>
+                                    <option value="12">Cada 12 horas</option>
+                                    <option value="24">Cada 24 horas (Diario)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Duración (Días)</label>
+                                <input type="number" value="3" min="1" required class="med-duracion">
+                            </div>
+                        </div>
+                        <div style="text-align: right; margin-top: 5px;">
+                            <button type="button" class="btn-remove" onclick="eliminarFila(this)">Eliminar</button>
+                        </div>
                     </div>
                 </div>
-            `;
-            contenedor.appendChild(div);
-        }
 
-        function eliminarFila(idFila) {
-            document.getElementById(idFila).remove();
-        }
-
-        function clasificarPaciente(edad) {
-            if (edad < 12) {
-                return {grupo: "Pediátrico", presentacion: "Líquida: Jarabe / Suspensión oral en mililitros (ml)"};
-            } else if (edad >= 12 && edad <= 64) {
-                return {grupo: "Adulto", presentacion: "Sólida: Tabletas, cápsulas o pastas convencionales"};
-            } else {
-                return {grupo: "Adulto Mayor", presentacion: "Sólida adaptada o gotas (vigilar deglución y polifarmacia)"};
-            }
-        }
-
-        function procesarTratamientoLocal() {
-            const nombre = document.getElementById('p_nombre').value;
-            const edad = parseInt(document.getElementById('p_edad').value) || 1;
-            const peso = parseFloat(document.getElementById('p_peso').value) || 1.0;
-
-            const clasificacion = clasificarPaciente(edad);
-
-            const selectores = document.querySelectorAll('.med-select');
-            const horas = document.querySelectorAll('.med-hora');
-            const dias = document.querySelectorAll('.med-dias');
-
-            let cronogramaAcumulado = [];
-            let alertasTopes = [];
-
-            for (let i = 0; i < selectores.length; i++) {
-                const medId = parseInt(selectores[i].value);
-                const horaStr = horas[i].value;
-                const diasTrat = parseInt(dias[i].value) || 1;
-
-                const med = CATALOGO_JS.find(m => m.id === medId);
-
-                let teoricaMg = peso * med.mg_kg;
-                let ajustada = false;
-                let dosisMg = teoricaMg;
-                if (teoricaMg > med.tope_mg) {
-                    dosisMg = med.tope_mg;
-                    ajustada = true;
-                }
-                const dosisG = Math.round((dosisMg / 1000.0) * 1000) / 1000;
-                const dosisMl = Math.round(((dosisMg * 5.0) / med.mg_5ml) * 10) / 10;
-
-                if (ajustada) {
-                    alertasTopes.push({
-                        farmaco: med.nombre,
-                        dosis_ajustada: `${dosisMl} ml / ${dosisG} g`
-                    });
-                }
-
-                let hIni = 8, mIni = 0;
-                try {
-                    const partes = horaStr.split(':');
-                    hIni = parseInt(partes[0]) || 0;
-                    mIni = parseInt(partes[1]) || 0;
-                } catch (e) {}
-
-                const tomasPorDia = Math.floor(24 / med.intervalo);
-                const totalTomas = tomasPorDia * diasTrat;
-                let hAct = hIni;
-                let diaAct = 1;
-                const dosisTexto = `${dosisG} g (${dosisMl} ml)`;
-
-                for (let k = 0; k < totalTomas; k++) {
-                    const minutosDelDia = hAct * 60 + mIni;
-                    const horaFormato = `${String(hAct).padStart(2, '0')}:${String(mIni).padStart(2, '0')}`;
-                    cronogramaAcumulado.push({
-                        minutos: minutosDelDia,
-                        dia: diaAct,
-                        hora: horaFormato,
-                        medicamento: med.nombre,
-                        dosis_texto: dosisTexto
-                    });
-
-                    let sigH = hAct + med.intervalo;
-                    if (sigH >= 24) {
-                        hAct = sigH % 24;
-                        diaAct++;
-                    } else {
-                        hAct = sigH;
-                    }
-                }
-            }
-
-            // Ordenar cronograma (Burbuja)
-            for (let i = 0; i < cronogramaAcumulado.length; i++) {
-                for (let j = 0; j < cronogramaAcumulado.length - i - 1; j++) {
-                    const tiempoJ = (cronogramaAcumulado[j].dia * 1440) + cronogramaAcumulado[j].minutos;
-                    const tiempoSig = (cronogramaAcumulado[j+1].dia * 1440) + cronogramaAcumulado[j+1].minutos;
-                    if (tiempoJ > tiempoSig) {
-                        const temp = cronogramaAcumulado[j];
-                        cronogramaAcumulado[j] = cronogramaAcumulado[j+1];
-                        cronogramaAcumulado[j+1] = temp;
-                    }
-                }
-            }
-
-            // Detectar cruces
-            let cruces = [];
-            let idx = 0;
-            while (idx < cronogramaAcumulado.length) {
-                const diaAct = cronogramaAcumulado[idx].dia;
-                const horaAct = cronogramaAcumulado[idx].hora;
-                let coincidencias = [cronogramaAcumulado[idx].medicamento];
-                let next = idx + 1;
-                while (next < cronogramaAcumulado.length && cronogramaAcumulado[next].dia === diaAct && cronogramaAcumulado[next].hora === horaAct) {
-                    coincidencias.push(cronogramaAcumulado[next].medicamento);
-                    next++;
-                }
-                if (coincidencias.length > 1) {
-                    cruces.push({dia: diaAct, hora: horaAct, farmacos: coincidencias});
-                }
-                idx = next;
-            }
-
-            // Renderizar resultados
-            document.getElementById('panel-resultados').style.display = 'block';
-            document.getElementById('res_cat').innerText = clasificacion.grupo;
-            document.getElementById('res_num_meds').innerText = selectores.length;
-            document.getElementById('res_total_tomas').innerText = cronogramaAcumulado.length;
-            document.getElementById('alerta_forma').innerHTML = `<strong>Recomendación:</strong> ${clasificacion.presentacion}`;
-
-            const contenedorTopes = document.getElementById('area_alertas_topes');
-            contenedorTopes.innerHTML = '';
-            alertasTopes.forEach(al => {
-                const d = document.createElement('div');
-                d.className = 'banner-alert danger';
-                d.style.display = 'block';
-                d.innerHTML = `⚠️ <strong>Tope Excedido en ${al.farmaco}:</strong> Ajustado a ${al.dosis_ajustada}.`;
-                contenedorTopes.appendChild(d);
-            });
-
-            const ac = document.getElementById('alerta_cruces');
-            if (cruces.length > 0) {
-                ac.className = 'banner-alert warning';
-                ac.style.display = 'block';
-                let msg = `⚠️ <strong>Tomas Simultáneas (${cruces.length}):</strong><br><ul>`;
-                cruces.forEach(cr => {
-                    msg += `<li>Día ${cr.dia} a las ${cr.hora}: ${cr.farmacos.join(', ')}</li>`;
-                });
-                ac.innerHTML = msg + '</ul>';
-            } else {
-                ac.className = 'banner-alert success';
-                ac.style.display = 'block';
-                ac.innerHTML = '✅ Ningún cruce de horario detectado.';
-            }
-
-            const tbody = document.getElementById('res_tabla');
-            tbody.innerHTML = '';
-            cronogramaAcumulado.forEach(t => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `<td><span class="badge-dia">Día ${t.dia}</span></td><td><span class="hora-text">${t.hora}</span></td><td><b>${t.medicamento}</b></td><td>${t.dosis_texto}</td>`;
-                tbody.appendChild(tr);
-            });
-        }
-    </script>
-</body>
-</html>
+                <button type="button" class="btn-add" onclick="agregarFila()">
